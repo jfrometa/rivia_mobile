@@ -24,7 +24,7 @@ This is a separate mobile initiative. It reuses as much as possible from the exi
 ## Tech Stack
 
 **Core**:
-- Expo SDK 51
+- Expo SDK 52
 - React Native
 - TypeScript (strict mode)
 - Expo Router (file-based navigation)

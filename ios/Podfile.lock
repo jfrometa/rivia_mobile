@@ -233,6 +233,8 @@ PODS:
     - ExpoModulesCore
   - ExpoSymbols (56.0.5):
     - ExpoModulesCore
+  - ExpoSystemUI (56.0.5):
+    - ExpoModulesCore
   - ExpoUI (56.0.14):
     - ExpoModulesCore
     - ExpoModulesWorklets
@@ -1664,7 +1666,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-safe-area-context (5.8.0):
+  - react-native-safe-area-context (5.7.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1676,8 +1678,8 @@ PODS:
     - React-graphics
     - React-ImageManager
     - React-jsi
-    - react-native-safe-area-context/common (= 5.8.0)
-    - react-native-safe-area-context/fabric (= 5.8.0)
+    - react-native-safe-area-context/common (= 5.7.0)
+    - react-native-safe-area-context/fabric (= 5.7.0)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1688,7 +1690,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-safe-area-context/common (5.8.0):
+  - react-native-safe-area-context/common (5.7.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1710,7 +1712,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-safe-area-context/fabric (5.8.0):
+  - react-native-safe-area-context/fabric (5.7.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2140,7 +2142,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNGestureHandler (3.0.0):
+  - RNGestureHandler (2.31.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2425,6 +2427,7 @@ DEPENDENCIES:
   - ExpoSecureStore (from `../node_modules/expo-secure-store/ios`)
   - ExpoSQLite (from `../node_modules/expo-sqlite/ios`)
   - ExpoSymbols (from `../node_modules/expo-symbols/ios`)
+  - ExpoSystemUI (from `../node_modules/expo-system-ui/ios`)
   - "ExpoUI (from `../node_modules/@expo/ui/ios`)"
   - EXUpdatesInterface (from `../node_modules/expo-updates-interface/ios`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
@@ -2558,6 +2561,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-sqlite/ios"
   ExpoSymbols:
     :path: "../node_modules/expo-symbols/ios"
+  ExpoSystemUI:
+    :path: "../node_modules/expo-system-ui/ios"
   ExpoUI:
     :path: "../node_modules/@expo/ui/ios"
   EXUpdatesInterface:
@@ -2752,6 +2757,7 @@ SPEC CHECKSUMS:
   ExpoSecureStore: 20be7fe1601ed1726afaf04ea1321a2b6ac549fc
   ExpoSQLite: 60a026ba25c2dc5e977cc62228a25393acffdd9b
   ExpoSymbols: 773655e2ad7b6bd6672b9c177a57f60cbc70eed8
+  ExpoSystemUI: 5b9bfd2ccc7933ee41711b8cddabecd1eed697e2
   ExpoUI: 08a386b0df7f97fcda3e7fd1d484dfeb197b0940
   EXUpdatesInterface: 211042a76ef49beec0de793aa4439de3164c4fd4
   FBLazyVector: 24e62c765683b8d89006a88a2c8f5cf019f0074d
@@ -2794,7 +2800,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: d86581169e9bb5bb6f5fc3c5052f890016c1bf21
   React-mutationobservernativemodule: 9a0c4e866f1ef2a57acebc902ebacbdf469ae741
   react-native-netinfo: 723f91aea0c7b4a8701bc1ede8fc162c8b1cf282
-  react-native-safe-area-context: c1eb308f4b36372a4de4b3bdaa8ed695ec3dd461
+  react-native-safe-area-context: a2325922b8594ddd27f98fb13437aec126be2502
   React-NativeModulesApple: cc6ec4767844d610e92cc358bd3ea34937438d56
   React-networking: a8ce15641ed7775d5b54a9d0d32defc367c2216e
   React-oscompat: 64a0c7ef5441855dc6e2a6afe8ba8f92aa05075e
@@ -2830,7 +2836,7 @@ SPEC CHECKSUMS:
   ReactCommon: 3ec2a55999d296af90c24beb66c8a77dc660d3ef
   ReactNativeDependencies: dda34b7cd86a28935fb52ac09ce830b94667b53d
   RNCMaskedView: 48989935d9665d97d87fa7e44f486b4d22cd5b9f
-  RNGestureHandler: 50877ea6cab4f5491d9603391cdecd6437341f4c
+  RNGestureHandler: acf7db8499c11193d9b4b6b1cc1439ff4f01a693
   RNReanimated: 348c0e2d7ca702d5a01acec9c4ad637f30203d4e
   RNScreens: 9b2e552ea56792a85c4efcc279edd61d9014be1c
   RNSVG: a37350c7bc37452fd2b209efa0806f1de0f847ae
