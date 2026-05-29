@@ -7,6 +7,7 @@ import { LoadingState } from "../../../components/ui/LoadingState";
 import { ErrorState } from "../../../components/ui/ErrorState";
 import { useRolesQuery } from "../../../features/role/queries";
 import { tokens } from "../../../theme";
+import type { Role } from "../../../features/role/types";
 
 export default function RolesScreen() {
   const { data, isLoading, error, refetch } = useRolesQuery();
@@ -24,7 +25,7 @@ export default function RolesScreen() {
       <FlatList
         data={data}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
+        renderItem={({ item }: { item: Role }) => (
           <Card style={styles.roleCard}>
             <AppText variant="lg" weight="600">
               {item.name}
@@ -33,7 +34,7 @@ export default function RolesScreen() {
               <AppText variant="sm" color={tokens.colors.gray[500]}>
                 Permisos:
               </AppText>
-              {item.permissions.map((perm, idx) => (
+              {item.permissions.map((perm: string, idx: number) => (
                 <AppText key={idx} variant="xs" color={tokens.colors.gray[600]}>
                   • {perm}
                 </AppText>
