@@ -1,0 +1,134 @@
+import React, { useState } from "react";
+import { View, StyleSheet, Alert } from "react-native";
+import { useRouter } from "expo-router";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Screen } from "../../components/ui/Screen";
+import { AppText } from "../../components/ui/AppText";
+import { AppButton } from "../../components/ui/AppButton";
+import { AppInput } from "../../components/ui/AppInput";
+import { Card } from "../../components/ui/Card";
+import { useAuth } from "../../services/auth/AuthProvider";
+import { login } from "../../services/api/auth";
+import { tokens } from "../../theme";
+
+const loginSchema = z.object({
+  email: z.string().email("Ingrese un email válido"),
+  password: z.string().min(1, "Ingrese su contraseña"),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+
+export default function LoginScreen() {
+  const router = useRouter();
+  const { signIn } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      setIsLoading(true);
+      const authResponse = await login(data);
+      await signIn({
+        user: authResponse.user,
+        accessToken: authResponse.accessToken,
+        refreshToken: authResponse.refreshToken,
+      });
+      router.replace("/(tabs)/dashboard");
+    } catch (error) {
+      Alert.alert(
+        "Error de inicio de sesión",
+        (error as Error)?.message || "Credenciales inválidas"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Screen>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <AppText variant="3xl" weight="bold">
+            Rivia Tasaciones
+          </AppText>
+          <AppText variant="md" color={tokens.colors.gray[500]}>
+            Inicia sesión en tu cuenta
+          </AppText>
+        </View>
+
+        <Card style={styles.card}>
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <AppInput
+                label="Email"
+                placeholder="tu@email.com"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                error={errors.email?.message}
+              />
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <AppInput
+                label="Contraseña"
+                placeholder="••••••••"
+                secureTextEntry
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                error={errors.password?.message}
+              />
+            )}
+          />
+
+          <AppButton
+            title="Iniciar Sesión"
+            onPress={handleSubmit(onSubmit)}
+            loading={isLoading}
+            style={styles.button}
+          />
+        </Card>
+      </View>
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    paddingVertical: tokens.spacing.xl,
+  },
+  header: {
+    alignItems: "center",
+    marginBottom: tokens.spacing.xl,
+  },
+  card: {
+    padding: tokens.spacing.lg,
+  },
+  button: {
+    marginTop: tokens.spacing.md,
+  },
+});
