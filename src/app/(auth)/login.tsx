@@ -41,10 +41,15 @@ export default function LoginScreen() {
     try {
       setIsLoading(true);
       const authResponse = await login(data);
+      console.log('Auth response: ', authResponse);
       await signIn({
-        user: authResponse.user,
-        accessToken: authResponse.accessToken,
-        refreshToken: authResponse.refreshToken,
+        user: {
+          id: authResponse.user.id,
+          email: authResponse.user.email,
+          name: authResponse.user.name ?? undefined,
+        },
+        accessToken: authResponse.token,
+        refreshToken: undefined,
       });
       router.replace("/(tabs)/dashboard");
     } catch (error) {

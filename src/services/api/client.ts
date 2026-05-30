@@ -26,6 +26,9 @@ export async function apiRequest<T>(
     headers["Authorization"] = `Bearer ${accessToken}`;
   }
 
+  console.log("URL: ", url)
+  console.log("Headers: ", headers)
+  console.log("Body: ", options.body)
   const response = await fetch(url, {
     method: options.method,
     headers,

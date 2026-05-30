@@ -11,7 +11,7 @@ setupReactQuery();
 
 export default function RootLayout() {
   useReactQueryFocusManager();
-    useEffect(() => {
+  useEffect(() => {
     // Sets the background color of the native root view
     SystemUI.setBackgroundColorAsync("#ffffff");
   }, []);
