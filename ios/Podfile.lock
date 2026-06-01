@@ -224,6 +224,11 @@ PODS:
   - ExpoModulesWorklets (56.0.14):
     - ExpoModulesCore
     - ExpoModulesJSI
+  - ExpoModulesWorkletsAdapter (56.0.14):
+    - ExpoModulesCore
+    - ExpoModulesJSI
+    - ExpoModulesWorklets
+    - RNWorklets
   - ExpoRouter (56.2.8):
     - ExpoModulesCore
     - RNScreens
@@ -2414,15 +2419,16 @@ DEPENDENCIES:
   - expo-dev-menu-interface (from `../node_modules/expo-dev-menu-interface/ios`)
   - ExpoAsset (from `../node_modules/expo-asset/ios`)
   - "ExpoDomWebView (from `../node_modules/@expo/dom-webview/ios`)"
-  - ExpoFileSystem (from `../node_modules/expo-file-system/ios`)
-  - ExpoFont (from `../node_modules/expo-font/ios`)
+  - ExpoFileSystem (from `../node_modules/expo-file-system/ios/ExpoFileSystem.podspec`)
+  - ExpoFont (from `../node_modules/expo-font/ios/ExpoFont.podspec`)
   - ExpoGlassEffect (from `../node_modules/expo-glass-effect/ios`)
   - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
   - ExpoLinking (from `../node_modules/expo-linking/ios`)
   - "ExpoLogBox (from `../node_modules/@expo/log-box`)"
-  - ExpoModulesCore (from `../node_modules/expo-modules-core`)
+  - ExpoModulesCore (from `../node_modules/expo-modules-core/ExpoModulesCore.podspec`)
   - ExpoModulesJSI (from `../node_modules/expo-modules-jsi/apple`)
-  - ExpoModulesWorklets (from `../node_modules/expo-modules-core`)
+  - ExpoModulesWorklets (from `../node_modules/expo-modules-core/ExpoModulesWorklets.podspec`)
+  - ExpoModulesWorkletsAdapter (from `../node_modules/expo-modules-core`)
   - ExpoRouter (from `../node_modules/expo-router/ios`)
   - ExpoSecureStore (from `../node_modules/expo-secure-store/ios`)
   - ExpoSQLite (from `../node_modules/expo-sqlite/ios`)
@@ -2536,9 +2542,9 @@ EXTERNAL SOURCES:
   ExpoDomWebView:
     :path: "../node_modules/@expo/dom-webview/ios"
   ExpoFileSystem:
-    :path: "../node_modules/expo-file-system/ios"
+    :podspec: "../node_modules/expo-file-system/ios/ExpoFileSystem.podspec"
   ExpoFont:
-    :path: "../node_modules/expo-font/ios"
+    :podspec: "../node_modules/expo-font/ios/ExpoFont.podspec"
   ExpoGlassEffect:
     :path: "../node_modules/expo-glass-effect/ios"
   ExpoKeepAwake:
@@ -2548,10 +2554,12 @@ EXTERNAL SOURCES:
   ExpoLogBox:
     :path: "../node_modules/@expo/log-box"
   ExpoModulesCore:
-    :path: "../node_modules/expo-modules-core"
+    :podspec: "../node_modules/expo-modules-core/ExpoModulesCore.podspec"
   ExpoModulesJSI:
     :path: "../node_modules/expo-modules-jsi/apple"
   ExpoModulesWorklets:
+    :podspec: "../node_modules/expo-modules-core/ExpoModulesWorklets.podspec"
+  ExpoModulesWorkletsAdapter:
     :path: "../node_modules/expo-modules-core"
   ExpoRouter:
     :path: "../node_modules/expo-router/ios"
@@ -2750,9 +2758,10 @@ SPEC CHECKSUMS:
   ExpoKeepAwake: edf05a0a5cdeddbb9fe705b49243ec6aef9cfded
   ExpoLinking: b17ffd3324cd5563ecdc07c47872d93c059ea419
   ExpoLogBox: ae61965ef8e88b08b1496a65ce6cf98e82190574
-  ExpoModulesCore: 7b876c8391370fb71d987130dcfd84e2ea1213fe
+  ExpoModulesCore: e7293940d668d121c440fb68b71d47f6b5eedee9
   ExpoModulesJSI: 3dc06d022a7745e465622a210083fa07a36c98cb
   ExpoModulesWorklets: 3268242d88c2ada46fc5ee0e075c994efffb1a52
+  ExpoModulesWorkletsAdapter: 253250ea91e23867ada3fe4778926493daee0caf
   ExpoRouter: c3023f1e6a702674e1f2973fe434058c16aba275
   ExpoSecureStore: 20be7fe1601ed1726afaf04ea1321a2b6ac549fc
   ExpoSQLite: 60a026ba25c2dc5e977cc62228a25393acffdd9b
@@ -2841,8 +2850,8 @@ SPEC CHECKSUMS:
   RNScreens: 9b2e552ea56792a85c4efcc279edd61d9014be1c
   RNSVG: d49e9b043822ac92430dd37fa1d7031aa80911b9
   RNWorklets: 4dba1eb7cbfc3e8db49e5cce18a1a471fd2ed696
-  Yoga: 36fee8f1fca3f54a28c3d7f80e69f66d73d3af96
+  Yoga: 77dfa8673de2874e1855002ae59c68b8be9b007b
 
 PODFILE CHECKSUM: 4a9d205a20d37b1e0b1694a6095436d24b61c815
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
