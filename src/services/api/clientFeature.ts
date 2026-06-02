@@ -11,6 +11,5 @@ export const ClientSchema = z.object({
 export type Client = z.infer<typeof ClientSchema>;
 
 export async function getClients(): Promise<Client[]> {
-  // TODO: Replace with actual endpoint
-  return api.get<Client[]>("/clients");
+  return api.get<Client[]>("/client");
 }

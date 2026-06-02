@@ -1,37 +1,26 @@
 import { api } from "./client";
 import { z } from "zod";
+import { AppraisalSchema, UpsertAppraisalSchema } from "../../features/appraisal/schema";
 
-export const AppraisalSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  status: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
-
-export type Appraisal = z.infer<typeof AppraisalSchema>;
+export const AppraisalResponseSchema = AppraisalSchema;
+export type Appraisal = z.infer<typeof AppraisalResponseSchema>;
 
 export async function getAppraisals(): Promise<Appraisal[]> {
-  // TODO: Replace with actual endpoint
-  return api.get<Appraisal[]>("/appraisals");
+  return api.get<Appraisal[]>("/appraisal");
 }
 
 export async function getAppraisalById(id: string): Promise<Appraisal> {
-  // TODO: Replace with actual endpoint
-  return api.get<Appraisal>(`/appraisals/${id}`);
+  return api.get<Appraisal>(`/appraisal/${id}`);
 }
 
-export async function createAppraisal(data: Partial<Appraisal>): Promise<Appraisal> {
-  // TODO: Replace with actual endpoint
-  return api.post<Appraisal>("/appraisals", data);
+export async function createAppraisal(data: z.infer<typeof UpsertAppraisalSchema>): Promise<Appraisal> {
+  return api.post<Appraisal>("/appraisal", data);
 }
 
 export async function updateAppraisal(id: string, data: Partial<Appraisal>): Promise<Appraisal> {
-  // TODO: Replace with actual endpoint
-  return api.patch<Appraisal>(`/appraisals/${id}`, data);
+  return api.patch<Appraisal>(`/appraisal/${id}`, data);
 }
 
 export async function sendAppraisalToReview(id: string): Promise<Appraisal> {
-  // TODO: Replace with actual endpoint
-  return api.post<Appraisal>(`/appraisals/${id}/send-to-review`);
+  return api.post<Appraisal>(`/appraisal/${id}/send-to-review`);
 }

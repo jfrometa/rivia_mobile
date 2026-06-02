@@ -6,12 +6,12 @@ import { AppText } from "../../../components/ui/AppText";
 import { Card } from "../../../components/ui/Card";
 import { LoadingState } from "../../../components/ui/LoadingState";
 import { ErrorState } from "../../../components/ui/ErrorState";
-import { useAppraisalByIdQuery } from "../../../features/appraisal/queries";
+import { useGetAppraisalByIdQuery } from "../../../services/api/apiSlice";
 import { tokens } from "../../../theme";
 
 export default function AppraisalDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data, isLoading, error, refetch } = useAppraisalByIdQuery(id);
+  const { data, isLoading, error, refetch } = useGetAppraisalByIdQuery(id!);
 
   if (isLoading) return <LoadingState />;
   if (error)
@@ -21,7 +21,7 @@ export default function AppraisalDetailScreen() {
     <Screen>
       <Card style={styles.detailCard}>
         <AppText variant="2xl" weight="bold" style={styles.title}>
-          {data?.title}
+          Tasación {data?.id}
         </AppText>
         <AppText variant="md" style={styles.status}>
           Estado: {data?.status}

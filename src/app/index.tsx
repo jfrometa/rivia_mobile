@@ -21,8 +21,8 @@ export default function Index() {
     return <Redirect href="/login" />;
   }
 
-  // Use the name of the file inside (tabs), for example: "dashboard"
-  return <Redirect href="/dashboard" />;
+  // Redirect to appraisals instead of dashboard
+  return <Redirect href="/(tabs)/appraisal" />;
 }
 
 const styles = StyleSheet.create({

@@ -1,16 +1,13 @@
 import { Stack } from "expo-router";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient, setupReactQuery, useReactQueryFocusManager } from "../lib/query-client";
+import { Provider } from "react-redux";
+import { store } from "../store";
 import { AuthProvider } from "../services/auth/AuthProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
 
 
-setupReactQuery();
-
 export default function RootLayout() {
-  useReactQueryFocusManager();
   useEffect(() => {
     // Sets the background color of the native root view
     SystemUI.setBackgroundColorAsync("#ffffff");
@@ -18,7 +15,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
         <AuthProvider>
           <Stack>
             <Stack.Screen name="index" options={{ headerShown: false }} />
@@ -26,7 +23,7 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           </Stack>
         </AuthProvider>
-      </QueryClientProvider>
+      </Provider>
     </GestureHandlerRootView>
   );
 }

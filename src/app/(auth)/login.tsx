@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
@@ -10,7 +10,7 @@ import { AppButton } from "../../components/ui/AppButton";
 import { AppInput } from "../../components/ui/AppInput";
 import { Card } from "../../components/ui/Card";
 import { useAuth } from "../../services/auth/AuthProvider";
-import { login } from "../../services/api/auth";
+import { useLoginMutation } from "../../services/api/apiSlice";
 import { tokens } from "../../theme";
 
 const loginSchema = z.object({
@@ -23,7 +23,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function LoginScreen() {
   const router = useRouter();
   const { signIn } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
+  const [loginMutation, { isLoading }] = useLoginMutation();
 
   const {
     control,
@@ -39,26 +39,27 @@ export default function LoginScreen() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      setIsLoading(true);
-      const authResponse = await login(data);
+      const authResponse = await loginMutation(data).unwrap();
       console.log('Auth response: ', authResponse);
       await signIn({
         user: {
           id: authResponse.user.id,
           email: authResponse.user.email,
           name: authResponse.user.name ?? undefined,
+          tenantId: authResponse.user.tenantId,
+          roles: authResponse.user.roles,
+          image: authResponse.user.image,
         },
         accessToken: authResponse.token,
         refreshToken: undefined,
       });
-      router.replace("/(tabs)/dashboard");
-    } catch (error) {
+      router.replace("/(tabs)/appraisal");
+    } catch (error: any) {
+      console.error("Login error:", error);
       Alert.alert(
         "Error de inicio de sesión",
-        (error as Error)?.message || "Credenciales inválidas"
+        error?.data?.message || error?.message || "Credenciales inválidas"
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 
