@@ -11,7 +11,7 @@
       "name": "Expo: iOS Simulator (Dev)",
       "type": "node-terminal",
       "request": "launch",
-      "command": "zsh -i -c 'cp .env.dev .env && nvm use 20 && bunx expo run:ios'"
+      "command": "zsh -i -c '.env && nvm use 20 && bunx expo run:ios'"
     },
     {
       "name": "Expo: Android Emulator (Local)",

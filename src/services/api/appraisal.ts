@@ -6,21 +6,47 @@ export const AppraisalResponseSchema = AppraisalSchema;
 export type Appraisal = z.infer<typeof AppraisalResponseSchema>;
 
 export async function getAppraisals(): Promise<Appraisal[]> {
-  return api.get<Appraisal[]>("/appraisal");
+  const response = await api.get<{ data: { data: Appraisal[] } }>("/appraisal/list");
+  return response.data.data.map(appraisal => {
+    if (typeof appraisal.fields === 'string') {
+      return { ...appraisal, fields: JSON.parse(appraisal.fields) };
+    }
+    return appraisal;
+  });
 }
 
 export async function getAppraisalById(id: string): Promise<Appraisal> {
-  return api.get<Appraisal>(`/appraisal/${id}`);
+  const response = await api.get<{ data: { data: Appraisal } }>(`/appraisal/${id}`);
+  const appraisal = response.data.data;
+  if (typeof appraisal.fields === 'string') {
+    return { ...appraisal, fields: JSON.parse(appraisal.fields) };
+  }
+  return appraisal;
 }
 
 export async function createAppraisal(data: z.infer<typeof UpsertAppraisalSchema>): Promise<Appraisal> {
-  return api.post<Appraisal>("/appraisal", data);
+  const response = await api.post<{ data: { data: Appraisal } }>("/appraisal", data);
+  const appraisal = response.data.data;
+  if (typeof appraisal.fields === 'string') {
+    return { ...appraisal, fields: JSON.parse(appraisal.fields) };
+  }
+  return appraisal;
 }
 
 export async function updateAppraisal(id: string, data: Partial<Appraisal>): Promise<Appraisal> {
-  return api.patch<Appraisal>(`/appraisal/${id}`, data);
+  const response = await api.patch<{ data: { data: Appraisal } }>(`/appraisal/${id}`, data);
+  const appraisal = response.data.data;
+  if (typeof appraisal.fields === 'string') {
+    return { ...appraisal, fields: JSON.parse(appraisal.fields) };
+  }
+  return appraisal;
 }
 
 export async function sendAppraisalToReview(id: string): Promise<Appraisal> {
-  return api.post<Appraisal>(`/appraisal/${id}/send-to-review`);
+  const response = await api.post<{ data: { data: Appraisal } }>(`/appraisal/${id}/send-to-review`);
+  const appraisal = response.data.data;
+  if (typeof appraisal.fields === 'string') {
+    return { ...appraisal, fields: JSON.parse(appraisal.fields) };
+  }
+  return appraisal;
 }
