@@ -2,154 +2,654 @@
 
 A standalone Expo React Native mobile app for Rivia Tasaciones, designed to integrate with the existing Next.js backend.
 
+---
+
+## 📋 Table of Contents
+1. [Project Purpose](#project-purpose)
+2. [Tech Stack](#tech-stack)
+3. [Architecture Overview](#architecture-overview)
+4. [Feature-First Folder Structure](#feature-first-folder-structure)
+5. [Data Flow Patterns](#data-flow-patterns)
+6. [Appraisal Feature: Complete Example](#appraisal-feature-complete-example)
+7. [Getting Started](#getting-started)
+8. [Available Scripts](#available-scripts)
+
+---
+
 ## Project Purpose
 
 This is a separate mobile initiative. It reuses as much as possible from the existing web implementation at the integration and architecture level:
 - Same backend APIs whenever possible
 - Same auth concepts (token-based)
 - Same feature-first folder philosophy
-- Same TanStack Query mental model
-- Same Zod + React Hook Form mental model
 - Same domain naming
 - Same business flows
 - Same team conventions
 
-## Goals
-
-- Minimize new libraries
-- Minimize retraining for the team
-- Maintain a clean, modern, production-ready Expo React Native codebase
-- Reuse existing backend APIs instead of reimplementing server logic
+---
 
 ## Tech Stack
 
-**Core**:
-- Expo SDK 52
-- React Native
-- TypeScript (strict mode)
-- Expo Router (file-based navigation)
+### Core
+- **Expo SDK 56** - Framework for React Native apps
+- **React Native 0.85** - UI framework
+- **TypeScript** - Strict type safety
+- **Expo Router** - File-based navigation
 
-**Data & Forms**:
-- TanStack Query v5 (server state)
-- Zod (validation)
-- React Hook Form (form management)
-- @hookform/resolvers
+### State Management & Data
+- **Redux Toolkit + RTK Query** - Primary state management and API caching
+- **TanStack Query v5** - Server state (alternative to RTK Query)
+- **Zustand** - Lightweight client state for local UI state
+- **Zod** - Schema validation
+- **React Hook Form** - Form management
+- **@hookform/resolvers** - Zod resolver for React Hook Form
 
-**Native/Platform**:
-- expo-secure-store (secure auth token storage)
-- @react-native-community/netinfo (network status)
-- expo-sqlite (foundation for future local persistence)
-- react-native-safe-area-context
-- react-native-screens
-- react-native-gesture-handler
-- Lucide React Native (icons)
+### Native/Platform
+- **expo-secure-store** - Secure auth token storage
+- **@react-native-community/netinfo** - Network status
+- **expo-sqlite** - Local SQLite database (foundation for offline support)
 
-**Dev Tools**:
-- ESLint with eslint-config-expo
-- TypeScript
+---
 
-**Package Manager**:
-- Bun (never use npm/pnpm)
+## Architecture Overview
 
-## Project Structure
+### State Management Strategy
+
+The project uses **multiple state management tools, each for a specific purpose**:
+
+| Tool | Use Case | Example |
+|------|----------|---------|
+| **Redux Toolkit + RTK Query** | Global API state, caching, invalidation | Appraisals list, user data |
+| **TanStack Query** | Server state (alternative/legacy) | Some queries may use this |
+| **Zustand** | Local UI state, wizard flows | Appraisal wizard steps, photos |
+| **SQLite** | Offline persistence | Draft appraisals, cached data |
+
+### API Integration
+
+Two approaches are available:
+1. **RTK Query (Recommended)** - Built-in caching, auto-refetch, tag-based invalidation
+2. **Traditional fetch client + TanStack Query** - More flexible, manual control
+
+---
+
+## Feature-First Folder Structure
 
 ```
 src/
 ├── app/                          # Expo Router routes
-│   ├── _layout.tsx              # Root layout (QueryClient, AuthProvider)
-│   ├── index.tsx                # Initial route (auth check)
-│   ├── (auth)/                  # Auth group
-│   │   ├── _layout.tsx
-│   │   └── login.tsx            # Login screen
-│   └── (tabs)/                  # Tab navigator group
-│       ├── _layout.tsx
-│       ├── dashboard.tsx        # Dashboard
-│       ├── appraisal/
-│       │   ├── index.tsx        # Appraisals list
-│       │   └── [id].tsx         # Appraisal detail
-│       ├── clients/
-│       │   └── index.tsx        # Clients list
-│       ├── comparison/
-│       │   └── index.tsx        # Comparables list
-│       ├── users/
-│       │   └── index.tsx        # Users list
-│       └── roles/
-│           └── index.tsx        # Roles list
-├── features/                     # Feature-first modules
-│   ├── appraisal/
-│   │   ├── components/
-│   │   ├── queries/
-│   │   ├── mutations/
-│   │   ├── hooks/
-│   │   ├── helpers/
-│   │   ├── utils/
-│   │   ├── schema.ts
-│   │   ├── types.ts
-│   │   └── mobile-mappers.ts
-│   ├── client/
-│   │   └── (same structure as appraisal)
-│   ├── dashboard/
-│   ├── review/
-│   ├── role/
-│   └── user/
-├── components/
-│   ├── ui/                      # Reusable UI primitives
-│   │   ├── Screen.tsx
-│   │   ├── AppText.tsx
-│   │   ├── AppButton.tsx
-│   │   ├── AppInput.tsx
-│   │   ├── Card.tsx
-│   │   ├── LoadingState.tsx
-│   │   └── ErrorState.tsx
-│   └── layout/
+│   ├── (auth)/                   # Auth screens
+│   └── (tabs)/                   # Main tab navigator
+│
+├── features/                     # Feature modules (feature-first)
+│   └── appraisal/                # Example: Appraisal feature
+│       ├── components/           # Feature-specific components
+│       ├── store/                # Zustand store for feature
+│       │   └── useAppraisalWizardStore.ts
+│       ├── queries.ts            # TanStack Query queries
+│       ├── mutations.ts          # TanStack Query mutations
+│       ├── schema.ts             # Zod validation schemas
+│       ├── types.ts              # TypeScript types
+│       └── mobile-mappers.ts     # Data mapping functions
+│
+├── components/ui/                # Reusable UI primitives
 ├── services/
-│   ├── api/                     # API client & endpoints
-│   │   ├── client.ts            # Fetch-based API client
-│   │   ├── config.ts            # API config (env vars)
-│   │   ├── errors.ts            # ApiError class
-│   │   ├── appraisal.ts
-│   │   ├── clientFeature.ts
-│   │   ├── comparison.ts
-│   │   ├── dashboard.ts
-│   │   ├── role.ts
-│   │   ├── user.ts
-│   │   └── auth.ts
-│   ├── auth/                    # Auth logic
-│   │   ├── AuthProvider.tsx
-│   │   ├── auth-storage.ts
-│   │   └── session.ts
-│   ├── storage/
-│   │   └── secure-storage.ts
-│   ├── network/
-│   │   ├── netinfo.ts
-│   │   └── react-query-online-manager.ts
-│   └── db/
-│       └── sqlite.ts            # expo-sqlite wrapper
-├── hooks/
-│   └── useAppState.ts
-├── lib/
-│   ├── query-client.ts          # TanStack Query config
-│   ├── env.ts                   # Environment config & validation
-│   └── constants.ts
-└── theme/
-    ├── tokens.ts                # Design tokens (colors, spacing, etc.)
-    └── index.ts
+│   ├── api/
+│   │   ├── apiSlice.ts           # RTK Query API slice
+│   │   ├── client.ts             # Traditional fetch client
+│   │   └── appraisal.ts          # API functions for appraisals
+│   ├── auth/                     # Auth logic
+│   ├── db/                       # SQLite database
+│   └── storage/                  # Secure storage
+│
+├── store/                        # Redux store configuration
+│   └── index.ts
+│
+└── lib/                          # Utilities, constants, config
 ```
 
-## Environment Variables
+---
 
-Create a `.env` file in the project root (copy from `.env.example`):
+## Data Flow Patterns
 
-```env
-# Backend API URL
-# For physical devices, use your computer's LAN IP instead of localhost
-# Example: EXPO_PUBLIC_API_BASE_URL=http://192.168.1.100:3000/api
-EXPO_PUBLIC_API_BASE_URL=http://localhost:3000/api
+### 1. RTK Query Pattern (Recommended)
+
+**Why use this?** - Auto-caching, refetch on focus, tag-based invalidation, built-in loading/error states.
+
+#### Step 1: Define your API slice
+
+File: `src/services/api/apiSlice.ts`
+
+```typescript
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { getAccessToken } from '../auth/auth-storage';
+
+export const apiSlice = createApi({
+  reducerPath: 'api',
+  baseQuery: async (args, api, extraOptions) => {
+    const rawBaseQuery = fetchBaseQuery({
+      baseUrl: process.env.EXPO_PUBLIC_API_BASE_URL,
+      prepareHeaders: async (headers) => {
+        const token = await getAccessToken();
+        if (token) {
+          headers.set('Authorization', `Bearer ${token}`);
+        }
+        return headers;
+      }
+    });
+    return rawBaseQuery(args, api, extraOptions);
+  },
+  tagTypes: ['Appraisal'], // Define entity types
+  endpoints: (builder) => ({
+    // Define queries and mutations
+    getAppraisals: builder.query<Appraisal[], void>({
+      query: () => '/appraisal/list',
+      providesTags: ['Appraisal'], // Tags this query provides
+    }),
+    getAppraisalById: builder.query<Appraisal, string>({
+      query: (id) => `/appraisal/${id}`,
+      providesTags: (result, error, id) => [{ type: 'Appraisal', id }],
+    }),
+    createAppraisal: builder.mutation<Appraisal, UpsertAppraisalSchemaType>({
+      query: (appraisal) => ({
+        url: '/appraisal',
+        method: 'POST',
+        body: appraisal,
+      }),
+      invalidatesTags: ['Appraisal'], // Invalidate tags on success
+    }),
+  }),
+});
+
+// Export auto-generated hooks
+export const {
+  useGetAppraisalsQuery,
+  useGetAppraisalByIdQuery,
+  useCreateAppraisalMutation,
+} = apiSlice;
 ```
 
-**Important**:
-- Expo environment variables must start with `EXPO_PUBLIC_` to be accessible in the app
-- For physical devices, `localhost` won't work - use your computer's LAN IP address
+#### Step 2: Configure Redux store
+
+File: `src/store/index.ts`
+
+```typescript
+import { configureStore } from '@reduxjs/toolkit';
+import { setupListeners } from '@reduxjs/toolkit/query/react';
+import { apiSlice } from '../services/api/apiSlice';
+
+export const store = configureStore({
+  reducer: {
+    [apiSlice.reducerPath]: apiSlice.reducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(apiSlice.middleware),
+});
+
+setupListeners(store.dispatch);
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+```
+
+#### Step 3: Wrap your app with Provider
+
+File: `src/app/_layout.tsx`
+
+```typescript
+import { Provider } from 'react-redux';
+import { store } from '../store';
+
+export default function RootLayout() {
+  return (
+    <Provider store={store}>
+      <AuthProvider>
+        <Stack>
+          {/* Screens */}
+        </Stack>
+      </AuthProvider>
+    </Provider>
+  );
+}
+```
+
+#### Step 4: Use in components
+
+```typescript
+import { useGetAppraisalsQuery, useCreateAppraisalMutation } from '../../services/api/apiSlice';
+
+export default function AppraisalsScreen() {
+  // Query: Get appraisals
+  const { data, isLoading, error, refetch } = useGetAppraisalsQuery();
+  
+  // Mutation: Create appraisal
+  const [createAppraisal] = useCreateAppraisalMutation();
+
+  const handleCreate = async (data) => {
+    try {
+      await createAppraisal(data).unwrap();
+      // No need to refetch manually - invalidatesTags handles it!
+    } catch (err) {
+      console.error('Failed to create:', err);
+    }
+  };
+
+  if (isLoading) return <LoadingState />;
+  if (error) return <ErrorState onRetry={refetch} />;
+
+  return <FlatList data={data} /* ... */ />;
+}
+```
+
+---
+
+### 2. TanStack Query Pattern (Alternative)
+
+**Why use this?** - More flexibility, separate from Redux ecosystem.
+
+#### Step 1: Define API functions
+
+File: `src/services/api/appraisal.ts`
+
+```typescript
+import { api } from "./client";
+import { Appraisal } from "../../features/appraisal/types";
+
+export async function getAppraisals(): Promise<Appraisal[]> {
+  const response = await api.get<{ data: { data: Appraisal[] } }>("/appraisal/list");
+  return response.data.data;
+}
+
+export async function createAppraisal(data): Promise<Appraisal> {
+  const response = await api.post<{ data: { data: Appraisal } }>("/appraisal", data);
+  return response.data.data;
+}
+```
+
+#### Step 2: Create query hooks
+
+File: `src/features/appraisal/queries.ts`
+
+```typescript
+import { useQuery } from "@tanstack/react-query";
+import { getAppraisals, getAppraisalById } from "../../services/api/appraisal";
+
+export const appraisalQueryKeys = {
+  all: ["appraisals"] as const,
+  lists: () => [...appraisalQueryKeys.all, "list"] as const,
+  details: (id: string) => [...appraisalQueryKeys.all, "detail", id] as const,
+};
+
+export function useAppraisalsQuery() {
+  return useQuery({
+    queryKey: appraisalQueryKeys.lists(),
+    queryFn: getAppraisals,
+  });
+}
+
+export function useAppraisalByIdQuery(id: string) {
+  return useQuery({
+    queryKey: appraisalQueryKeys.details(id),
+    queryFn: () => getAppraisalById(id),
+    enabled: !!id,
+  });
+}
+```
+
+#### Step 3: Create mutation hooks
+
+File: `src/features/appraisal/mutations.ts`
+
+```typescript
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createAppraisal } from "../../services/api/appraisal";
+import { appraisalQueryKeys } from "./queries";
+
+export function useCreateAppraisalMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createAppraisal,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: appraisalQueryKeys.lists() });
+    },
+  });
+}
+```
+
+#### Step 4: Use in components
+
+```typescript
+import { useAppraisalsQuery } from '../../features/appraisal/queries';
+import { useCreateAppraisalMutation } from '../../features/appraisal/mutations';
+
+export default function AppraisalsScreen() {
+  const { data, isLoading, error, refetch } = useAppraisalsQuery();
+  const { mutate: createAppraisal } = useCreateAppraisalMutation();
+
+  // Same usage pattern as RTK Query
+}
+```
+
+---
+
+### 3. Zustand Pattern (Local UI State)
+
+**Why use this?** - Lightweight, no boilerplate, great for form wizards, UI flows.
+
+#### Step 1: Create a store
+
+File: `src/features/appraisal/store/useAppraisalWizardStore.ts`
+
+```typescript
+import { create } from 'zustand';
+
+interface AppraisalWizardState {
+  photos: string[];
+  currentStepIndex: number;
+  updateField: (field: string, value: any) => void;
+  addPhoto: (uri: string) => void;
+  nextStep: () => void;
+  previousStep: () => void;
+}
+
+export const useAppraisalWizardStore = create<AppraisalWizardState>((set, get) => ({
+  photos: [],
+  currentStepIndex: 0,
+  
+  updateField: (field, value) => set((state) => ({ ...state, [field]: value })),
+  
+  addPhoto: (uri) => set((state) => ({ 
+    photos: [...state.photos, uri] 
+  })),
+  
+  nextStep: () => set((state) => ({ 
+    currentStepIndex: Math.min(state.currentStepIndex + 1, 5) 
+  })),
+  
+  previousStep: () => set((state) => ({ 
+    currentStepIndex: Math.max(state.currentStepIndex - 1, 0) 
+  })),
+}));
+```
+
+#### Step 2: Use in components
+
+```typescript
+import { useAppraisalWizardStore } from '../store/useAppraisalWizardStore';
+
+export default function AppraisalWizard() {
+  const { 
+    currentStepIndex, 
+    photos, 
+    addPhoto, 
+    nextStep, 
+    previousStep,
+    updateField 
+  } = useAppraisalWizardStore();
+
+  return (
+    <View>
+      <StepIndicator current={currentStepIndex} />
+      <Button title="Next" onPress={nextStep} />
+      <Button title="Add Photo" onPress={() => addPhoto('uri')} />
+    </View>
+  );
+}
+```
+
+---
+
+### 4. SQLite Pattern (Offline Persistence)
+
+**Why use this?** - Offline-first capabilities, caching, draft storage.
+
+#### Step 1: Database setup
+
+File: `src/services/db/sqlite.ts`
+
+```typescript
+import * as SQLite from "expo-sqlite";
+
+const DB_NAME = "rivia.db";
+
+export async function openDatabase(): Promise<SQLite.SQLiteDatabase> {
+  return await SQLite.openDatabaseAsync(DB_NAME);
+}
+
+export async function initializeDatabase(): Promise<void> {
+  const db = await openDatabase();
+  
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS appraisal_drafts (
+      id TEXT PRIMARY KEY NOT NULL,
+      data TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+  `);
+}
+
+export async function saveAppraisalDraft(id: string, data: any): Promise<void> {
+  const db = await openDatabase();
+  const now = new Date().toISOString();
+  
+  await db.runAsync(
+    `INSERT OR REPLACE INTO appraisal_drafts (id, data, created_at, updated_at)
+     VALUES (?, ?, ?, ?)`,
+    [id, JSON.stringify(data), now, now]
+  );
+}
+
+export async function getAppraisalDraft(id: string): Promise<any | null> {
+  const db = await openDatabase();
+  const result = await db.getFirstAsync(
+    `SELECT data FROM appraisal_drafts WHERE id = ?`,
+    [id]
+  );
+  return result ? JSON.parse((result as any).data) : null;
+}
+```
+
+---
+
+## Appraisal Feature: Complete Example
+
+Let's walk through the appraisal feature end-to-end.
+
+### 1. Types & Schema
+
+File: `src/features/appraisal/types.ts`
+
+```typescript
+import { z } from "zod";
+import { AppraisalSchema, UpsertAppraisalSchema } from "./schema";
+
+export type Appraisal = z.infer<typeof AppraisalSchema>;
+export type UpsertAppraisalSchemaType = z.infer<typeof UpsertAppraisalSchema>;
+```
+
+File: `src/features/appraisal/schema.ts`
+
+```typescript
+import { z } from "zod";
+
+export const AppraisalSchema = z.object({
+  id: z.string(),
+  status: z.string(),
+  fields: z.any().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export const UpsertAppraisalSchema = z.object({
+  clientId: z.string(),
+  propertyType: z.string(),
+  address: z.string(),
+  // Add more fields...
+});
+```
+
+### 2. RTK Query Endpoints
+
+(Already covered in apiSlice.ts above)
+
+### 3. List Screen
+
+File: `src/app/(tabs)/appraisal/index.tsx`
+
+```typescript
+import React from "react";
+import { View, FlatList, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
+import { Screen } from "../../../components/ui/Screen";
+import { AppText } from "../../../components/ui/AppText";
+import { AppButton } from "../../../components/ui/AppButton";
+import { Card } from "../../../components/ui/Card";
+import { LoadingState } from "../../../components/ui/LoadingState";
+import { ErrorState } from "../../../components/ui/ErrorState";
+import { useGetAppraisalsQuery } from "../../../services/api/apiSlice";
+import { tokens } from "../../../theme";
+
+export default function AppraisalsScreen() {
+  const router = useRouter();
+  const { data, isLoading, error, refetch } = useGetAppraisalsQuery();
+
+  if (isLoading) return <LoadingState />;
+  if (error) {
+    return <ErrorState message="Error loading appraisals" onRetry={refetch} />;
+  }
+
+  return (
+    <Screen>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <AppText variant="2xl" weight="bold">Tasaciones</AppText>
+        <AppButton
+          title="Nueva"
+          onPress={() => router.push("/(tabs)/appraisal/new")}
+        />
+      </View>
+
+      <FlatList
+        data={data || []}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => router.push(`/(tabs)/appraisal/${item.id}`)}
+          >
+            <Card>
+              <AppText variant="lg" weight="600">ID: {item.id}</AppText>
+              <AppText variant="sm">Estado: {item.status}</AppText>
+              <AppText variant="xs">
+                Creada: {new Date(item.createdAt).toLocaleDateString()}
+              </AppText>
+            </Card>
+          </TouchableOpacity>
+        )}
+      />
+    </Screen>
+  );
+}
+```
+
+### 4. Detail Screen
+
+File: `src/app/(tabs)/appraisal/[id].tsx`
+
+```typescript
+import React from "react";
+import { View } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+import { Screen } from "../../../components/ui/Screen";
+import { AppText } from "../../../components/ui/AppText";
+import { LoadingState } from "../../../components/ui/LoadingState";
+import { ErrorState } from "../../../components/ui/ErrorState";
+import { useGetAppraisalByIdQuery } from "../../../services/api/apiSlice";
+
+export default function AppraisalDetailScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { data: appraisal, isLoading, error, refetch } = useGetAppraisalByIdQuery(id);
+
+  if (isLoading) return <LoadingState />;
+  if (error) return <ErrorState onRetry={refetch} />;
+  if (!appraisal) return <AppText>No data</AppText>;
+
+  return (
+    <Screen>
+      <AppText variant="2xl" weight="bold">Appraisal {appraisal.id}</AppText>
+      <AppText>Status: {appraisal.status}</AppText>
+      <AppText>Created: {new Date(appraisal.createdAt).toLocaleString()}</AppText>
+    </Screen>
+  );
+}
+```
+
+### 5. Create Screen
+
+File: `src/app/(tabs)/appraisal/new.tsx`
+
+```typescript
+import React from "react";
+import { View } from "react-native";
+import { useRouter } from "expo-router";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Screen } from "../../../components/ui/Screen";
+import { AppText } from "../../../components/ui/AppText";
+import { AppInput } from "../../../components/ui/AppInput";
+import { AppButton } from "../../../components/ui/AppButton";
+import { LoadingState } from "../../../components/ui/LoadingState";
+import { useCreateAppraisalMutation } from "../../../services/api/apiSlice";
+import { UpsertAppraisalSchema } from "../../../features/appraisal/schema";
+import { useAppraisalWizardStore } from "../../../features/appraisal/store/useAppraisalWizardStore";
+
+export default function NewAppraisalScreen() {
+  const router = useRouter();
+  const { currentStepIndex, nextStep, previousStep } = useAppraisalWizardStore();
+  const [createAppraisal, { isLoading }] = useCreateAppraisalMutation();
+
+  const { control, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(UpsertAppraisalSchema),
+    defaultValues: {
+      clientId: "",
+      propertyType: "",
+      address: "",
+    },
+  });
+
+  const onSubmit = async (data) => {
+    try {
+      await createAppraisal(data).unwrap();
+      router.back();
+    } catch (err) {
+      console.error("Failed to create appraisal:", err);
+    }
+  };
+
+  if (isLoading) return <LoadingState />;
+
+  return (
+    <Screen>
+      <AppText variant="2xl" weight="bold">Nueva Tasación</AppText>
+      
+      <Controller
+        control={control}
+        name="address"
+        render={({ field: { onChange, value } }) => (
+          <AppInput
+            label="Dirección"
+            value={value}
+            onChangeText={onChange}
+            error={errors.address?.message}
+          />
+        )}
+      />
+
+      <AppButton title="Crear" onPress={handleSubmit(onSubmit)} />
+    </Screen>
+  );
+}
+```
+
+---
 
 ## Getting Started
 
@@ -174,85 +674,61 @@ EXPO_PUBLIC_API_BASE_URL=http://localhost:3000/api
 
 ### Backend Dependency
 
-This app requires the existing Next.js backend/API to be running and accessible. Make sure:
-- The backend server is running
-- The API endpoints are accessible
-- CORS is configured for mobile requests (if needed)
-
-### Auth Limitations
-
-The existing web app uses NextAuth.js. If the current implementation depends on browser cookies only, the mobile app may require backend adaptation for token-based authentication.
-
-**TODO items for auth**:
-- Verify backend login endpoint returns access/refresh tokens
-- Test token refresh flow
-- Ensure API endpoints accept Bearer tokens in Authorization header
+This app requires the existing Next.js backend/API to be running and accessible.
 
 ### Running the App
 
-1. Start the Expo dev server:
-   ```bash
-   bun dev
-   # or
-   bun start
-   ```
-
-2. Follow terminal instructions to run on:
-   - iOS simulator: Press `i`
-   - Android emulator: Press `a`
-   - Physical device: Scan QR code with Expo Go app
-
-### Available Scripts
-
 ```bash
-bun dev          # Start Expo dev server
-bun start        # Same as bun dev
-bun ios          # Start iOS simulator
-bun android      # Start Android emulator
-bun web          # Start web version
-bun lint         # Run ESLint
-bun type-check   # Run TypeScript type checking
+# Start Expo dev server
+bun start
+
+# iOS simulator
+bun ios
+
+# Android emulator
+bun android
 ```
 
-## Architecture Notes
+---
 
-### What's Reused
+## Available Scripts
 
-- API contracts (endpoints, request/response shapes)
-- Domain types and naming
-- Zod validation schemas
-- TanStack Query usage patterns
-- Feature-first folder structure
-- Business logic flow
+```bash
+bun start              # Start Expo dev server
+bun start:local        # Use .env.local and start
+bun start:dev          # Use .env.dev and start
+bun android            # Run on Android
+bun ios                # Run on iOS
+bun web                # Run on web
+bun ts:check           # TypeScript check
+bun lint               # Run ESLint
+bun lint:fix           # Fix lint issues
+bun format             # Format with Prettier
+bun prebuild           # Prebuild native code
+```
 
-### What's Not Reused Directly
+---
 
-- Next.js app router files
-- Prisma/backend service files
-- Radix UI components
-- PandaCSS runtime (we use design tokens + StyleSheet instead)
+## Key Conventions
+
+1. **Feature-first**: All code related to a feature lives in `src/features/[feature-name]/`
+2. **Type safety**: Use Zod for validation and infer types from schemas
+3. **Use RTK Query by default**: For most API interactions
+4. **Zustand for UI state**: Wizard flows, local form state
+5. **SQLite for offline**: Drafts, persistent caching
+6. **Never commit secrets**: Use environment variables
+
+---
+
+## Architecture Decisions
+
+See table above for state management tool selection.
+
+---
 
 ## Next Steps
 
-1. **Finalize auth integration**: Work with backend team to ensure token-based auth is working
-2. **Align exact API endpoints**: Replace placeholder endpoints in `src/services/api/*.ts`
-3. **Extract shared schemas**: Manually copy/align Zod schemas from web app if useful
-4. **Add uploads/documents**: Implement file uploads if needed
-5. **Offline drafts**: Build out expo-sqlite implementation for offline functionality later
-6. **Add Sentry**: Set up error monitoring when ready
-7. **Write tests**: Add unit tests for business logic, integration tests for critical paths
-
-## Acceptance Criteria Met
-
-✅ Standalone Expo project  
-✅ No monorepo dependency  
-✅ Expo Router for navigation  
-✅ TanStack Query for server state  
-✅ React Hook Form + Zod for forms  
-✅ expo-secure-store for auth tokens  
-✅ NetInfo + TanStack Query online integration  
-✅ Requested folder structure  
-✅ Screens: login, dashboard, appraisal list, appraisal detail, clients, comparison, users, roles  
-✅ API client using `EXPO_PUBLIC_API_BASE_URL`  
-✅ README with setup/run instructions  
-✅ Designed to reuse existing backend APIs
+1. Complete SQLite implementation for offline drafts
+2. Add Sentry for error monitoring
+3. Write unit tests for business logic
+4. Add integration tests for critical flows
